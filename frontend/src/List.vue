@@ -157,14 +157,12 @@ function onDragEnd() {
 
 <template>
   <div class="page">
-    <div class="topbar">
-      <h1>발표자료</h1>
-    </div>
+    <h1>발표자료</h1>
 
     <div v-if="error" class="error">{{ error }}</div>
     <div v-if="notice" class="hint">{{ notice }}</div>
 
-    <div v-if="items.length === 0" class="empty">아직 발표자료가 없습니다.</div>
+    <div v-if="items.length === 0" class="empty">아직 올린 자료가 없습니다. html 파일이나 zip을 이 화면에 끌어다 놓으세요.</div>
 
     <section v-for="g in groups" :key="g.name || '__none'" class="category">
       <h2 v-if="g.name">{{ g.name }}</h2>
@@ -196,10 +194,10 @@ function onDragEnd() {
     </section>
     <datalist id="cats"><option v-for="c in categories" :key="c" :value="c" /></datalist>
 
-    <p class="hint footer">html 파일이나 zip(index.html 포함)을 이 화면에 끌어다 놓으면 업로드됩니다. 같은 이름이면 덮어쓰고, 항목을 끌어서 순서와 카테고리를 바꿀 수 있습니다.</p>
+    <p v-if="items.length > 0" class="hint footer">html 파일이나 zip을 끌어다 놓으면 올라갑니다. 같은 이름이면 덮어쓰고, 항목을 끌어 순서와 카테고리를 바꿀 수 있습니다.</p>
 
     <div v-if="fileOver" class="dropzone">
-      <div>{{ uploading ? '업로드 중…' : '여기에 놓으면 업로드됩니다' }}</div>
+      <div>{{ uploading ? '올리는 중' : '놓으면 올라갑니다' }}</div>
     </div>
   </div>
 </template>

@@ -23,9 +23,10 @@ async function submit() {
 
 <template>
   <form class="center" @submit.prevent="submit">
-    <div style="width: 100%; max-width: 320px">
+    <div class="login">
+      <h1>발표자료</h1>
       <input class="field" type="password" v-model="password" placeholder="비밀번호" autofocus />
-      <button class="primary" style="width: 100%; margin-top: 10px" :disabled="busy || !password">들어가기</button>
+      <div><button class="go" :disabled="busy || !password">들어가기</button></div>
       <div v-if="error" class="error">{{ error }}</div>
     </div>
   </form>

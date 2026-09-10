@@ -1,34 +1,173 @@
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
+
+:root {
+  --paper: #ffffff;
+  --ink: #000000;
+  --muted: #6b6b6b;
+  --rule: #e6e6e6;
+  --accent: #1f4fd8;
+  --danger: #b3261e;
+  --col: 560px;
+}
+
 * { box-sizing: border-box; }
-html, body { margin: 0; background: #fff; color: #222; font-family: -apple-system, "Segoe UI", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; }
+
+html, body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Pretendard Variable", Pretendard, -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
 a { color: inherit; }
-button { font: inherit; cursor: pointer; }
-input { font: inherit; }
-.center { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
-.page { max-width: 640px; margin: 0 auto; padding: 48px 24px 96px; }
-.topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
-.topbar h1 { font-size: 20px; font-weight: 600; margin: 0; }
-.ghost { background: none; border: 1px solid #ddd; border-radius: 6px; padding: 6px 12px; color: #444; }
-.ghost.on { background: #222; color: #fff; border-color: #222; }
-.primary { background: #222; color: #fff; border: none; border-radius: 6px; padding: 10px 16px; }
-.primary:disabled { opacity: .5; cursor: default; }
-.field { width: 100%; padding: 10px 12px; border: 1px solid #ccc; border-radius: 6px; }
-.error { color: #c00; font-size: 14px; margin-top: 8px; }
-.category { margin-top: 28px; }
-.category h2 { font-size: 13px; font-weight: 600; color: #888; letter-spacing: .04em; margin: 0 0 8px; }
-.item { display: flex; align-items: center; gap: 10px; padding: 12px 8px; border-bottom: 1px solid #eee; }
-.item a { flex: 1; text-decoration: none; font-size: 16px; }
-.item a:hover { text-decoration: underline; }
-.item.dragging { opacity: .4; }
-.item.over { border-top: 2px solid #222; }
-.danger { background: none; border: 1px solid #e88; color: #c00; border-radius: 4px; padding: 5px 8px; }
-.hint { color: #888; font-size: 14px; }
-.empty { color: #888; text-align: center; padding: 48px 0; }
-.item { cursor: grab; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+input { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ---------- 로그인 ---------- */
+.center {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.login {
+  width: 100%;
+  max-width: 280px;
+}
+.login h1 {
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  margin: 0 0 32px;
+}
+.login .field {
+  width: 100%;
+  padding: 10px 0;
+  border: 0;
+  border-bottom: 1px solid var(--ink);
+  border-radius: 0;
+  background: transparent;
+  font-size: 17px;
+}
+.login .field::placeholder { color: var(--muted); }
+.login .field:focus-visible { outline: 0; border-bottom-color: var(--accent); }
+.login .go {
+  margin-top: 20px;
+  font-size: 15px;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.login .go:disabled { color: var(--muted); text-decoration: none; cursor: default; }
+.error { color: var(--danger); font-size: 14px; margin-top: 12px; }
+
+/* ---------- 목록 ---------- */
+.page {
+  max-width: var(--col);
+  margin: 0 auto;
+  padding: 96px 24px 120px;
+}
+.page h1 {
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  margin: 0 0 48px;
+}
+.hint { color: var(--muted); font-size: 14px; }
+.empty {
+  color: var(--muted);
+  font-size: 17px;
+  padding: 8px 0 40px;
+}
+.footer { margin-top: 64px; }
+
+.category { position: relative; margin-top: 40px; }
+.category:first-of-type { margin-top: 0; }
+.category h2 {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+  margin: 0 0 6px;
+  line-height: 1.4;
+}
+/* 넓은 화면에서는 카테고리 이름을 왼쪽 여백에 걸어 둔다. */
+@media (min-width: 880px) {
+  .category h2 {
+    position: absolute;
+    right: 100%;
+    top: 14px;
+    margin: 0 24px 0 0;
+    width: 120px;
+    text-align: right;
+  }
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 52px;
+  padding: 10px 0;
+  border-top: 1px solid var(--rule);
+  cursor: grab;
+}
+.category .item:last-child { border-bottom: 1px solid var(--rule); }
 .item.editing { cursor: default; }
-.item input { padding: 6px 8px; border: 1px solid #ccc; border-radius: 4px; }
+.item.dragging { opacity: 0.35; }
+.item.over { box-shadow: inset 0 2px 0 var(--accent); }
+.item a {
+  flex: 1;
+  min-width: 0;
+  font-size: 17px;
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.item a:hover { text-decoration: underline; text-underline-offset: 4px; }
+
+.actions { display: flex; gap: 14px; opacity: 0; transition: opacity 120ms; }
+.item:hover .actions, .item:focus-within .actions { opacity: 1; }
+.actions button { font-size: 14px; color: var(--muted); }
+.actions button:hover { color: var(--ink); }
+.actions button.danger:hover { color: var(--danger); }
+@media (hover: none) { .actions { opacity: 1; } }
+
+.item input {
+  padding: 6px 0;
+  border: 0;
+  border-bottom: 1px solid var(--ink);
+  border-radius: 0;
+  background: transparent;
+  font-size: 17px;
+}
+.item input:focus-visible { outline: 0; border-bottom-color: var(--accent); }
 .item input.title { flex: 1; min-width: 0; }
-.item input.cat { width: 120px; }
-.actions { display: none; gap: 6px; }
-.item:hover .actions { display: flex; }
-.footer { margin-top: 40px; text-align: center; }
-.dropzone { position: fixed; inset: 0; background: rgba(255,255,255,.85); border: 3px dashed #222; display: flex; align-items: center; justify-content: center; font-size: 20px; pointer-events: none; z-index: 10; }
+.item input.cat { width: 110px; font-size: 14px; }
+.item .ghost { font-size: 14px; color: var(--muted); }
+.item .ghost:hover { color: var(--ink); }
+
+/* ---------- 드롭 오버레이 ---------- */
+.dropzone {
+  position: fixed;
+  inset: 16px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1.5px dashed var(--accent);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  pointer-events: none;
+  z-index: 10;
+  animation: fade 140ms ease-out;
+}
+@keyframes fade { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .dropzone { animation: none; }
+  .actions { transition: none; }
+}
