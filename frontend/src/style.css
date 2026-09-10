@@ -84,7 +84,8 @@ input { font: inherit; color: inherit; }
   padding: 8px 0 40px;
 }
 .footer { margin-top: 48px; }
-.add-category { margin-top: 32px; padding-top: 14px; border-top: 1px solid var(--rule); }
+.add-category { display: flex; align-items: center; gap: 16px; margin-top: 32px; }
+.add-category::before { content: ""; flex: 1; border-top: 1px solid var(--rule); }
 .add-category .add { font-size: 14px; color: var(--muted); }
 .add-category .add:hover { color: var(--ink); }
 .new-cat {
@@ -94,7 +95,7 @@ input { font: inherit; color: inherit; }
   border-radius: 0;
   background: transparent;
   font-size: 14px;
-  width: 200px;
+  width: 160px;
 }
 .new-cat:focus-visible { outline: 0; border-bottom-color: var(--accent); }
 
