@@ -1,10 +1,11 @@
 from fastapi import Depends, FastAPI, HTTPException, Response
 from pydantic import BaseModel
 
-from . import auth
+from . import auth, items
 from .config import Settings, get_settings
 
 app = FastAPI(title="presentation-web")
+app.include_router(items.router)
 
 
 class LoginBody(BaseModel):
