@@ -1,0 +1,33 @@
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #fff; color: #222; font-family: -apple-system, "Segoe UI", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; }
+a { color: inherit; }
+button { font: inherit; cursor: pointer; }
+input { font: inherit; }
+.center { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
+.page { max-width: 640px; margin: 0 auto; padding: 48px 24px 96px; }
+.topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+.topbar h1 { font-size: 20px; font-weight: 600; margin: 0; }
+.ghost { background: none; border: 1px solid #ddd; border-radius: 6px; padding: 6px 12px; color: #444; }
+.ghost.on { background: #222; color: #fff; border-color: #222; }
+.primary { background: #222; color: #fff; border: none; border-radius: 6px; padding: 10px 16px; }
+.primary:disabled { opacity: .5; cursor: default; }
+.field { width: 100%; padding: 10px 12px; border: 1px solid #ccc; border-radius: 6px; }
+.error { color: #c00; font-size: 14px; margin-top: 8px; }
+.category { margin-top: 28px; }
+.category h2 { font-size: 13px; font-weight: 600; color: #888; letter-spacing: .04em; margin: 0 0 8px; }
+.item { display: flex; align-items: center; gap: 10px; padding: 12px 8px; border-bottom: 1px solid #eee; }
+.item a { flex: 1; text-decoration: none; font-size: 16px; }
+.item a:hover { text-decoration: underline; }
+.item.dragging { opacity: .4; }
+.item.over { border-top: 2px solid #222; }
+.handle { cursor: grab; color: #aaa; user-select: none; }
+.item input { padding: 6px 8px; border: 1px solid #ccc; border-radius: 4px; }
+.item input.title { flex: 1; min-width: 0; }
+.item input.cat { width: 120px; }
+.danger { background: none; border: 1px solid #e88; color: #c00; border-radius: 4px; padding: 5px 8px; }
+.upload { border: 2px dashed #ccc; border-radius: 8px; padding: 20px; margin-bottom: 8px; }
+.upload.over { border-color: #222; background: #fafafa; }
+.upload .row { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.upload .row input.field { flex: 1; min-width: 140px; }
+.hint { color: #888; font-size: 14px; }
+.empty { color: #888; text-align: center; padding: 48px 0; }
