@@ -10,6 +10,9 @@ cp .env.example .env      # APP_PASSWORD, SECRET_KEY 수정
 docker compose up -d --build
 ```
 
+`.env`가 없어도 뜬다. 그때는 비밀번호가 `password`이고, 서명 키는 `data/secret_key`에 자동 생성되어 재시작 후에도 유지된다.
+로그에 `APP_PASSWORD가 설정되지 않아` 경고가 보이면 `.env`가 컨테이너에 전달되지 않은 것이다. `.env`가 `docker-compose.yml`과 같은 폴더에 있는지, 줄 형식이 `APP_PASSWORD=값` 인지 확인하고 `docker compose up -d --force-recreate` 로 다시 띄운다.
+
 컨테이너는 `127.0.0.1:${HOST_PORT:-8080}` 에만 바인딩된다. 같은 서버에서는 `http://127.0.0.1:8080` 으로 접속하고, 외부 공개는 nginx 같은 리버스 프록시로 이 주소를 넘긴다. 발표자료와 메타데이터는 `./data` 에 저장된다.
 
 ## 사용법

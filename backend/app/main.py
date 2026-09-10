@@ -17,6 +17,11 @@ class LoginBody(BaseModel):
     password: str
 
 
+@app.api_route("/api/health", methods=["GET", "HEAD"])
+def health():
+    return {"ok": True}
+
+
 @app.post("/api/login")
 def login(body: LoginBody, response: Response, settings: Settings = Depends(get_settings)):
     if not auth.check_password(settings, body.password):
@@ -48,6 +53,6 @@ STATIC_DIR = Path(os.environ.get("STATIC_DIR", Path(__file__).resolve().parents[
 if (STATIC_DIR / "index.html").is_file():
     app.mount("/assets", StaticFiles(directory=STATIC_DIR / "assets"), name="assets")
 
-    @app.get("/{path:path}", include_in_schema=False)
+    @app.api_route("/{path:path}", methods=["GET", "HEAD"], include_in_schema=False)
     def spa(path: str):
         return FileResponse(STATIC_DIR / "index.html")

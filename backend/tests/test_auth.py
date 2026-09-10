@@ -23,3 +23,25 @@ def test_logout(auth):
 def test_tampered_cookie(client):
     client.cookies.set("session", "garbage")
     assert client.get("/api/me").status_code == 401
+
+
+def test_defaults_when_env_missing(tmp_path, monkeypatch):
+    monkeypatch.setenv("DATA_DIR", str(tmp_path))
+    monkeypatch.delenv("APP_PASSWORD", raising=False)
+    monkeypatch.delenv("SECRET_KEY", raising=False)
+    from app.config import get_settings
+
+    get_settings.cache_clear()
+    s = get_settings()
+    assert s.app_password == "password"
+    assert len(s.secret_key) >= 32
+    assert (tmp_path / "secret_key").read_text().strip() == s.secret_key
+    # 다시 읽어도 같은 키를 쓴다 (세션이 재시작 후에도 유지됨)
+    get_settings.cache_clear()
+    assert get_settings().secret_key == s.secret_key
+
+
+def test_head_root_is_allowed(client):
+    assert client.head("/").status_code in (200, 404)
+    assert client.head("/api/health").status_code == 200
+    assert client.get("/api/health").json() == {"ok": True}
