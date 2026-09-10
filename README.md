@@ -10,7 +10,7 @@ cp .env.example .env      # APP_PASSWORD, SECRET_KEY 수정
 docker compose up -d --build
 ```
 
-`http://<서버주소>:8000` 접속. 발표자료와 메타데이터는 `./data` 에 저장된다.
+컨테이너는 `127.0.0.1:${HOST_PORT:-8080}` 에만 바인딩된다. 같은 서버에서는 `http://127.0.0.1:8080` 으로 접속하고, 외부 공개는 nginx 같은 리버스 프록시로 이 주소를 넘긴다. 발표자료와 메타데이터는 `./data` 에 저장된다.
 
 ## 사용법
 
