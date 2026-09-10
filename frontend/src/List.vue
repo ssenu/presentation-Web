@@ -74,9 +74,9 @@ async function onWindowDrop(e) {
   e.preventDefault()
   dragDepth = 0
   fileOver.value = false
-  const files = [...e.dataTransfer.files].filter((f) => /\.zip$/i.test(f.name))
+  const files = [...e.dataTransfer.files].filter((f) => /\.(zip|html?)$/i.test(f.name))
   if (files.length === 0) {
-    error.value = 'zip 파일만 올릴 수 있습니다.'
+    error.value = 'zip 또는 html 파일만 올릴 수 있습니다.'
     return
   }
   uploading.value = true
@@ -196,7 +196,7 @@ function onDragEnd() {
     </section>
     <datalist id="cats"><option v-for="c in categories" :key="c" :value="c" /></datalist>
 
-    <p class="hint footer">zip 파일을 이 화면에 끌어다 놓으면 업로드됩니다. 같은 이름이면 덮어쓰고, 항목을 끌어서 순서와 카테고리를 바꿀 수 있습니다.</p>
+    <p class="hint footer">html 파일이나 zip(index.html 포함)을 이 화면에 끌어다 놓으면 업로드됩니다. 같은 이름이면 덮어쓰고, 항목을 끌어서 순서와 카테고리를 바꿀 수 있습니다.</p>
 
     <div v-if="fileOver" class="dropzone">
       <div>{{ uploading ? '업로드 중…' : '여기에 놓으면 업로드됩니다' }}</div>

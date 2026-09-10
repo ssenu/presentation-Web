@@ -75,3 +75,22 @@ def test_size_limit(tmp_path, monkeypatch):
     with pytest.raises(UploadError) as e:
         extract_presentation(make_zip({"index.html": b"x" * 11}), tmp_path / "p")
     assert e.value.status_code == 413
+
+
+def test_single_html(tmp_path):
+    from app.uploads import save_single_html
+
+    dest = tmp_path / "p"
+    save_single_html(b"<h1>solo</h1>", dest)
+    assert (dest / "index.html").read_bytes() == b"<h1>solo</h1>"
+
+
+def test_single_html_replaces_existing(tmp_path):
+    from app.uploads import save_single_html
+
+    dest = tmp_path / "p"
+    dest.mkdir()
+    (dest / "old.png").write_bytes(b"x")
+    save_single_html(b"new", dest)
+    assert not (dest / "old.png").exists()
+    assert (dest / "index.html").read_bytes() == b"new"

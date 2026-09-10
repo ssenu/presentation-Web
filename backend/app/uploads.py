@@ -63,3 +63,28 @@ def extract_presentation(zip_bytes: bytes, dest: Path) -> None:
     if dest.exists():
         shutil.rmtree(dest)
     tmp.rename(dest)
+
+
+def save_single_html(html_bytes: bytes, dest: Path) -> None:
+    """단일 html 파일을 dest/index.html 로 저장한다. 기존 폴더는 통째로 교체한다."""
+    if len(html_bytes) > MAX_TOTAL_BYTES:
+        raise UploadError(413, "파일이 200MB를 넘습니다")
+    tmp = dest.with_name(dest.name + ".extracting")
+    if tmp.exists():
+        shutil.rmtree(tmp)
+    tmp.mkdir(parents=True)
+    (tmp / "index.html").write_bytes(html_bytes)
+    if dest.exists():
+        shutil.rmtree(dest)
+    tmp.rename(dest)
+
+
+def store_upload(filename: str, data: bytes, dest: Path) -> None:
+    """확장자로 zip / 단일 html 을 구분해 dest 에 저장한다."""
+    suffix = Path(filename or "").suffix.lower()
+    if suffix in (".html", ".htm"):
+        save_single_html(data, dest)
+    elif suffix == ".zip" or data[:2] == b"PK":
+        extract_presentation(data, dest)
+    else:
+        raise UploadError(400, "zip 또는 html 파일만 올릴 수 있습니다")

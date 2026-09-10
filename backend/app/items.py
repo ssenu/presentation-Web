@@ -8,7 +8,7 @@ from pydantic import BaseModel
 from .auth import require_login
 from .config import Settings, get_settings
 from .store import Item, Store
-from .uploads import UploadError, extract_presentation
+from .uploads import UploadError, store_upload
 
 router = APIRouter(dependencies=[Depends(require_login)])
 
@@ -51,7 +51,7 @@ async def upload_item(
         status = 201
 
     try:
-        extract_presentation(data, store.item_dir(target.slug))
+        store_upload(file.filename or "", data, store.item_dir(target.slug))
     except UploadError as e:
         if existing is None:
             store.remove(target.slug)

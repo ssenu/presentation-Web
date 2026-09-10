@@ -102,3 +102,21 @@ def test_serve_blocks_traversal(auth, data_dir):
     # httpx가 경로를 정규화해 /secret.txt 로 보내므로 SPA 셸이 응답할 수 있다. 비밀 내용만 아니면 된다.
     r = auth.get("/p/a/../../secret.txt")
     assert r.content != b"s"
+
+
+def test_upload_single_html(auth):
+    r = auth.post("/api/items", files={"file": ("My Talk.html", b"<h1>solo</h1>", "text/html")})
+    assert r.status_code == 201, r.text
+    assert r.json()["title"] == "My Talk"
+    assert auth.get("/p/My-Talk/").content == b"<h1>solo</h1>"
+
+
+def test_upload_htm_extension(auth):
+    r = auth.post("/api/items", files={"file": ("t.htm", b"<p>x</p>", "text/html")})
+    assert r.status_code == 201
+
+
+def test_upload_unknown_type_rejected(auth):
+    r = auth.post("/api/items", files={"file": ("notes.txt", b"hello", "text/plain")})
+    assert r.status_code == 400
+    assert auth.get("/api/items").json() == []
