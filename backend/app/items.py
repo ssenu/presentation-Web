@@ -26,6 +26,34 @@ class OrderBody(BaseModel):
     slugs: list[str]
 
 
+class CategoryBody(BaseModel):
+    name: str
+
+
+@router.get("/api/categories", response_model=list[str])
+def list_categories(store: Store = Depends(get_store)):
+    return store.categories()
+
+
+@router.post("/api/categories", status_code=201)
+def create_category(body: CategoryBody, store: Store = Depends(get_store)):
+    try:
+        return {"name": store.add_category(body.name)}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.delete("/api/categories/{name}", status_code=204)
+def delete_category(name: str, store: Store = Depends(get_store)):
+    try:
+        store.remove_category(name)
+    except KeyError:
+        raise HTTPException(status_code=404, detail="카테고리가 없습니다")
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    return Response(status_code=204)
+
+
 @router.get("/api/items", response_model=list[Item])
 def list_items(store: Store = Depends(get_store)):
     return store.list()

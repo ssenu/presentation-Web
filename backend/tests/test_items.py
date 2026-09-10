@@ -120,3 +120,18 @@ def test_upload_unknown_type_rejected(auth):
     r = auth.post("/api/items", files={"file": ("notes.txt", b"hello", "text/plain")})
     assert r.status_code == 400
     assert auth.get("/api/items").json() == []
+
+
+def test_category_api(auth):
+    assert auth.get("/api/categories").json() == []
+    r = auth.post("/api/categories", json={"name": "회사"})
+    assert r.status_code == 201 and r.json() == {"name": "회사"}
+    assert auth.post("/api/categories", json={"name": "회사"}).status_code == 400
+    assert auth.post("/api/categories", json={"name": " "}).status_code == 400
+    upload(auth, title="a", category="회사")
+    assert auth.get("/api/categories").json() == ["회사"]
+    assert auth.delete("/api/categories/회사").status_code == 400
+    auth.patch("/api/items/a", json={"category": ""})
+    assert auth.delete("/api/categories/회사").status_code == 204
+    assert auth.delete("/api/categories/회사").status_code == 404
+    assert auth.get("/api/categories").json() == []

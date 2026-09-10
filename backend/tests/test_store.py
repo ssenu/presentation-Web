@@ -90,3 +90,40 @@ def test_persists_across_instances(tmp_path):
     again = Store(tmp_path)
     assert again.get("a").category == "cat"
     assert json.loads((tmp_path / "index.json").read_text("utf-8"))["items"][0]["slug"] == "a"
+
+
+def test_categories_empty(store):
+    assert store.categories() == []
+
+
+def test_add_category_and_order(store):
+    store.add_category("회사")
+    store.add_category("개인")
+    assert store.categories() == ["회사", "개인"]
+    with pytest.raises(ValueError):
+        store.add_category("회사")
+    with pytest.raises(ValueError):
+        store.add_category("  ")
+
+
+def test_item_category_is_registered_automatically(store):
+    store.add("a", "새것")
+    assert store.categories() == ["새것"]
+    store.update("a", category="다른것")
+    assert store.categories() == ["새것", "다른것"]
+
+
+def test_remove_category_only_when_empty(store):
+    store.add_category("빈것")
+    store.add("a", "찬것")
+    with pytest.raises(ValueError):
+        store.remove_category("찬것")
+    store.remove_category("빈것")
+    assert store.categories() == ["찬것"]
+    with pytest.raises(KeyError):
+        store.remove_category("없음")
+
+
+def test_categories_persist(tmp_path):
+    Store(tmp_path).add_category("c")
+    assert Store(tmp_path).categories() == ["c"]

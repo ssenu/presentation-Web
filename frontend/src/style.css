@@ -83,17 +83,47 @@ input { font: inherit; color: inherit; }
   font-size: 17px;
   padding: 8px 0 40px;
 }
-.footer { margin-top: 64px; }
+.footer { margin-top: 48px; }
+.add-category { margin-top: 32px; padding-top: 14px; border-top: 1px solid var(--rule); }
+.add-category .add { font-size: 14px; color: var(--muted); }
+.add-category .add:hover { color: var(--ink); }
+.new-cat {
+  padding: 4px 0;
+  border: 0;
+  border-bottom: 1px solid var(--ink);
+  border-radius: 0;
+  background: transparent;
+  font-size: 14px;
+  width: 200px;
+}
+.new-cat:focus-visible { outline: 0; border-bottom-color: var(--accent); }
 
 .category { position: relative; margin-top: 40px; }
+.category.collapsed { min-height: 24px; }
 .category:first-of-type { margin-top: 0; }
 .category h2 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   font-size: 13px;
   font-weight: 500;
   color: var(--muted);
   margin: 0 0 6px;
   line-height: 1.4;
 }
+.category h2 .toggle { display: inline-flex; align-items: center; gap: 4px; color: inherit; }
+.category h2 .toggle:hover { color: var(--ink); }
+.caret { display: inline-block; margin-right: 2px; transition: transform 120ms; }
+.caret.closed { transform: rotate(-90deg); }
+.count { color: var(--muted); font-weight: 400; }
+.remove-cat { font-size: 12px; color: var(--muted); opacity: 0; }
+.category:hover .remove-cat { opacity: 1; }
+.remove-cat:hover { color: var(--danger); }
+.category.over { box-shadow: -8px 0 0 var(--paper), -10px 0 0 var(--accent); }
+.none-label { color: var(--accent); }
+.item.placeholder { cursor: default; }
+.item.placeholder .hint { flex: 1; }
+.category.over .item.placeholder .hint { color: var(--accent); }
 /* 넓은 화면에서는 카테고리 이름을 왼쪽 여백에 걸어 둔다. */
 @media (min-width: 880px) {
   .category h2 {
@@ -102,8 +132,9 @@ input { font: inherit; color: inherit; }
     top: 14px;
     margin: 0 24px 0 0;
     width: 120px;
-    text-align: right;
+    justify-content: flex-end;
   }
+  .category h2 .remove-cat { position: absolute; left: 100%; margin-left: 12px; }
 }
 
 .item {
@@ -115,7 +146,6 @@ input { font: inherit; color: inherit; }
   border-top: 1px solid var(--rule);
   cursor: grab;
 }
-.category .item:last-child { border-bottom: 1px solid var(--rule); }
 .item.editing { cursor: default; }
 .item.dragging { opacity: 0.35; }
 .item.over { box-shadow: inset 0 2px 0 var(--accent); }
@@ -170,4 +200,5 @@ input { font: inherit; color: inherit; }
 @media (prefers-reduced-motion: reduce) {
   .dropzone { animation: none; }
   .actions { transition: none; }
+  .caret { transition: none; }
 }

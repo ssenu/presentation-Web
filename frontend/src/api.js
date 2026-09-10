@@ -34,4 +34,7 @@ export const api = {
   patch: (slug, body) => request('PATCH', `/api/items/${encodeURIComponent(slug)}`, body),
   remove: (slug) => request('DELETE', `/api/items/${encodeURIComponent(slug)}`),
   reorder: (slugs) => request('PUT', '/api/items/order', { slugs }),
+  categories: () => request('GET', '/api/categories'),
+  addCategory: (name) => request('POST', '/api/categories', { name }),
+  removeCategory: (name) => request('DELETE', `/api/categories/${encodeURIComponent(name)}`),
 }
