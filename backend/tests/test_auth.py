@@ -45,3 +45,11 @@ def test_head_root_is_allowed(client):
     assert client.head("/").status_code in (200, 404)
     assert client.head("/api/health").status_code == 200
     assert client.get("/api/health").json() == {"ok": True}
+
+
+def test_login_cookie_is_session_only(client):
+    r = client.post("/api/login", json={"password": "pw"})
+    set_cookie = r.headers["set-cookie"].lower()
+    assert "max-age" not in set_cookie
+    assert "expires" not in set_cookie
+    assert "httponly" in set_cookie

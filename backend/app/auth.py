@@ -6,7 +6,8 @@ from itsdangerous import BadSignature, TimestampSigner
 from .config import Settings, get_settings
 
 COOKIE_NAME = "session"
-MAX_AGE = 30 * 24 * 60 * 60
+# 세션 쿠키(브라우저를 닫으면 삭제)이지만, 토큰 자체도 이 시간이 지나면 무효가 된다.
+MAX_AGE = 12 * 60 * 60
 
 
 def make_token(secret: str) -> str:

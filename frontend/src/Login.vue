@@ -22,10 +22,17 @@ async function submit() {
 </script>
 
 <template>
-  <form class="center" @submit.prevent="submit">
+  <form class="center" autocomplete="off" @submit.prevent="submit">
     <div class="login">
       <h1>발표자료</h1>
-      <input class="field" type="password" v-model="password" placeholder="비밀번호" autofocus />
+      <input
+        class="field"
+        type="password"
+        v-model="password"
+        placeholder="비밀번호"
+        autocomplete="one-time-code"
+        autofocus
+      />
       <div><button class="go" :disabled="busy || !password">들어가기</button></div>
       <div v-if="error" class="error">{{ error }}</div>
     </div>

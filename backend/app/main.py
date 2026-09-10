@@ -29,7 +29,6 @@ def login(body: LoginBody, response: Response, settings: Settings = Depends(get_
     response.set_cookie(
         auth.COOKIE_NAME,
         auth.make_token(settings.secret_key),
-        max_age=auth.MAX_AGE,
         httponly=True,
         samesite="lax",
     )

@@ -1,22 +1,13 @@
 <script setup>
-import { onMounted, ref } from 'vue'
-import { api } from './api'
+import { ref } from 'vue'
 import Login from './Login.vue'
 import List from './List.vue'
 
-const state = ref('loading')
-
-onMounted(async () => {
-  try {
-    await api.me()
-    state.value = 'in'
-  } catch {
-    state.value = 'out'
-  }
-})
+// 화면을 열 때마다 비밀번호를 묻는다. 이전 로그인 상태를 자동으로 확인하지 않는다.
+const state = ref('out')
 </script>
 
 <template>
   <Login v-if="state === 'out'" @done="state = 'in'" />
-  <List v-else-if="state === 'in'" @logout="state = 'out'" />
+  <List v-else @logout="state = 'out'" />
 </template>
