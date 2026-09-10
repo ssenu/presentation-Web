@@ -7,3 +7,4 @@ frontend/dist/
 data/*
 !data/.gitkeep
 .env
+.playwright-mcp/

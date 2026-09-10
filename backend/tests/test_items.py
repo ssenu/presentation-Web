@@ -99,5 +99,6 @@ def test_serve_blocks_traversal(auth, data_dir):
     (data_dir / "secret.txt").write_text("s")
     r = auth.get("/p/a/%2e%2e/%2e%2e/secret.txt")
     assert r.status_code in (400, 404)
+    # httpx가 경로를 정규화해 /secret.txt 로 보내므로 SPA 셸이 응답할 수 있다. 비밀 내용만 아니면 된다.
     r = auth.get("/p/a/../../secret.txt")
-    assert r.status_code in (400, 404)
+    assert r.content != b"s"
