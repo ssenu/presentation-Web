@@ -339,8 +339,6 @@ function commitMove(list, moving, category) {
       <button v-else class="add" @click="startAddCategory">+ 카테고리 추가</button>
     </div>
 
-    <p v-if="items.length > 0" class="hint footer">html 파일이나 zip을 끌어다 놓으면 올라갑니다. 같은 이름이면 덮어쓰고, 항목을 끌어 순서와 카테고리를 바꿀 수 있습니다.</p>
-
     <div v-if="fileOver" class="dropzone">
       <div>{{ uploading ? '올리는 중' : '놓으면 올라갑니다' }}</div>
     </div>
