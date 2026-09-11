@@ -84,11 +84,11 @@ input { font: inherit; color: inherit; }
   padding: 8px 0 40px;
 }
 .footer { margin-top: 48px; }
-.add-category { display: flex; align-items: center; gap: 16px; margin-top: 32px; }
-.add-category::before { content: ""; flex: 1; border-top: 1px solid var(--rule); }
+.add-category { display: flex; align-items: center; gap: 16px; margin-top: 56px; }
+.add-category::after { content: ""; flex: 1; border-top: 1px solid var(--rule); }
 .add-category .add { font-size: 14px; color: var(--muted); }
 .add-category .add:hover { color: var(--ink); }
-.new-cat {
+.new-cat, .rename-cat {
   padding: 4px 0;
   border: 0;
   border-bottom: 1px solid var(--ink);
@@ -97,44 +97,46 @@ input { font: inherit; color: inherit; }
   font-size: 14px;
   width: 160px;
 }
-.new-cat:focus-visible { outline: 0; border-bottom-color: var(--accent); }
+.new-cat:focus-visible, .rename-cat:focus-visible { outline: 0; border-bottom-color: var(--accent); }
 
-.category { position: relative; margin-top: 40px; }
-.category.collapsed { min-height: 24px; }
+/* ---------- 카테고리 ---------- */
+.category { position: relative; margin-top: 36px; }
 .category:first-of-type { margin-top: 0; }
 .category h2 {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   font-size: 13px;
   font-weight: 500;
   color: var(--muted);
-  margin: 0 0 6px;
+  margin: 0 0 12px;
   line-height: 1.4;
+  min-height: 24px;
 }
-.category h2 .toggle { display: inline-flex; align-items: center; gap: 4px; color: inherit; }
+.category h2 .rule { flex: 1; border-top: 1px solid var(--rule); }
+.category h2 .toggle { display: inline-flex; align-items: center; gap: 6px; color: inherit; }
 .category h2 .toggle:hover { color: var(--ink); }
-.caret { display: inline-block; margin-right: 2px; transition: transform 120ms; }
+.caret { display: inline-block; transition: transform 160ms; }
 .caret.closed { transform: rotate(-90deg); }
 .count { color: var(--muted); font-weight: 400; }
-.remove-cat { font-size: 12px; color: var(--muted); opacity: 0; }
-.category:hover .remove-cat { opacity: 1; }
-.remove-cat:hover { color: var(--danger); }
-.category.over { box-shadow: -8px 0 0 var(--paper), -10px 0 0 var(--accent); }
+.cat-actions { display: flex; gap: 12px; opacity: 0; transition: opacity 120ms; }
+.category h2:hover .cat-actions, .category h2:focus-within .cat-actions { opacity: 1; }
+.cat-actions .ghost { font-size: 12px; color: var(--muted); }
+.cat-actions .ghost:hover { color: var(--ink); }
+.cat-actions .ghost.danger:hover { color: var(--danger); }
+@media (hover: none) { .cat-actions { opacity: 1; } }
+.rename-form { display: inline-flex; }
+.category.over h2 .rule { border-top-color: var(--accent); }
+.category.over h2 { color: var(--accent); }
 .none-label { color: var(--accent); }
 .item.placeholder .hint { flex: 1; }
 .category.over .item.placeholder .hint { color: var(--accent); }
-/* 넓은 화면에서는 카테고리 이름을 왼쪽 여백에 걸어 둔다. */
-@media (min-width: 880px) {
-  .category h2 {
-    position: absolute;
-    right: 100%;
-    top: 17px;
-    margin: 0 24px 0 0;
-    width: 120px;
-    justify-content: flex-end;
-  }
-  .category h2 .remove-cat { position: absolute; left: 100%; margin-left: 12px; }
+
+/* 펼칠 때 파일이 하나씩 나타난다 */
+.item.reveal { animation: reveal 260ms ease-out both; animation-delay: calc(var(--i, 0) * 45ms); }
+@keyframes reveal {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: none; }
 }
 
 .item {
@@ -206,6 +208,7 @@ input { font: inherit; color: inherit; }
 @keyframes fade { from { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) {
   .dropzone { animation: none; }
-  .actions, .item { transition: none; }
+  .actions, .item, .cat-actions { transition: none; }
   .caret { transition: none; }
+  .item.reveal { animation: none; }
 }

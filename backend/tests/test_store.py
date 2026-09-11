@@ -113,15 +113,33 @@ def test_item_category_is_registered_automatically(store):
     assert store.categories() == ["새것", "다른것"]
 
 
-def test_remove_category_only_when_empty(store):
+def test_remove_category_moves_items_to_uncategorized(store):
     store.add_category("빈것")
     store.add("a", "찬것")
-    with pytest.raises(ValueError):
-        store.remove_category("찬것")
+    store.remove_category("찬것")
+    assert store.get("a").category == ""
+    assert store.categories() == ["빈것"]
     store.remove_category("빈것")
-    assert store.categories() == ["찬것"]
+    assert store.categories() == []
     with pytest.raises(KeyError):
         store.remove_category("없음")
+
+
+def test_rename_category(store):
+    store.add_category("옛것")
+    store.add_category("다른것")
+    store.add("a", "옛것")
+    store.rename_category("옛것", "새것")
+    assert store.categories() == ["새것", "다른것"]
+    assert store.get("a").category == "새것"
+    with pytest.raises(KeyError):
+        store.rename_category("없음", "x")
+    with pytest.raises(ValueError):
+        store.rename_category("새것", "다른것")
+    with pytest.raises(ValueError):
+        store.rename_category("새것", "  ")
+    store.rename_category("새것", "새것")  # 같은 이름은 그대로 통과
+    assert store.categories() == ["새것", "다른것"]
 
 
 def test_categories_persist(tmp_path):

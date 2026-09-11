@@ -110,12 +110,31 @@ class Store:
         return name
 
     def remove_category(self, name: str) -> None:
+        """카테고리를 지운다. 들어 있던 파일은 미분류로 옮긴다."""
         if name not in self._categories:
             raise KeyError(name)
-        if any(i.category == name for i in self._items):
-            raise ValueError("파일이 들어 있는 카테고리는 지울 수 없습니다")
+        for it in self._items:
+            if it.category == name:
+                it.category = ""
         self._categories.remove(name)
         self._save()
+
+    def rename_category(self, old: str, new: str) -> str:
+        if old not in self._categories:
+            raise KeyError(old)
+        new = new.strip()
+        if not new:
+            raise ValueError("카테고리 이름을 입력하세요")
+        if new == old:
+            return new
+        if new in self._categories:
+            raise ValueError("이미 있는 카테고리입니다")
+        self._categories[self._categories.index(old)] = new
+        for it in self._items:
+            if it.category == old:
+                it.category = new
+        self._save()
+        return new
 
     def remove(self, slug: str) -> None:
         item = self.get(slug)

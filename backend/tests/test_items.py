@@ -130,8 +130,15 @@ def test_category_api(auth):
     assert auth.post("/api/categories", json={"name": " "}).status_code == 400
     upload(auth, title="a", category="회사")
     assert auth.get("/api/categories").json() == ["회사"]
-    assert auth.delete("/api/categories/회사").status_code == 400
-    auth.patch("/api/items/a", json={"category": ""})
-    assert auth.delete("/api/categories/회사").status_code == 204
-    assert auth.delete("/api/categories/회사").status_code == 404
-    assert auth.get("/api/categories").json() == []
+
+    r = auth.patch("/api/categories/회사", json={"name": "팀"})
+    assert r.status_code == 200 and r.json() == {"name": "팀"}
+    assert auth.get("/api/items").json()[0]["category"] == "팀"
+    assert auth.patch("/api/categories/없음", json={"name": "x"}).status_code == 404
+    auth.post("/api/categories", json={"name": "다른"})
+    assert auth.patch("/api/categories/팀", json={"name": "다른"}).status_code == 400
+
+    assert auth.delete("/api/categories/팀").status_code == 204
+    assert auth.get("/api/items").json()[0]["category"] == ""
+    assert auth.delete("/api/categories/팀").status_code == 404
+    assert auth.get("/api/categories").json() == ["다른"]

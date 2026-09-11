@@ -37,4 +37,5 @@ export const api = {
   categories: () => request('GET', '/api/categories'),
   addCategory: (name) => request('POST', '/api/categories', { name }),
   removeCategory: (name) => request('DELETE', `/api/categories/${encodeURIComponent(name)}`),
+  renameCategory: (name, newName) => request('PATCH', `/api/categories/${encodeURIComponent(name)}`, { name: newName }),
 }

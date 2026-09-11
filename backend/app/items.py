@@ -43,6 +43,16 @@ def create_category(body: CategoryBody, store: Store = Depends(get_store)):
         raise HTTPException(status_code=400, detail=str(e))
 
 
+@router.patch("/api/categories/{name}")
+def rename_category(name: str, body: CategoryBody, store: Store = Depends(get_store)):
+    try:
+        return {"name": store.rename_category(name, body.name)}
+    except KeyError:
+        raise HTTPException(status_code=404, detail="카테고리가 없습니다")
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
 @router.delete("/api/categories/{name}", status_code=204)
 def delete_category(name: str, store: Store = Depends(get_store)):
     try:

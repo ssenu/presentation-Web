@@ -87,9 +87,31 @@ function submitCategory() {
   if (!name) return
   run(() => api.addCategory(name))
 }
-function removeCategory(name) {
-  if (!confirm(`"${name}" 카테고리를 지울까요?`)) return
-  run(() => api.removeCategory(name))
+function removeCategory(g) {
+  const msg = g.list.length
+    ? `"${g.name}" 카테고리를 지울까요? 안에 있는 파일 ${g.list.length}개는 카테고리 없음으로 옮겨집니다.`
+    : `"${g.name}" 카테고리를 지울까요?`
+  if (!confirm(msg)) return
+  run(() => api.removeCategory(g.name))
+}
+const renamingCategory = ref(null)
+const renameValue = ref('')
+function startRenameCategory(name) {
+  renamingCategory.value = name
+  renameValue.value = name
+}
+function submitRenameCategory() {
+  const old = renamingCategory.value
+  const next = renameValue.value.trim()
+  renamingCategory.value = null
+  if (!old || !next || next === old) return
+  run(async () => {
+    await api.renameCategory(old, next)
+    if (collapsed.value.has(old)) {
+      toggle(old)
+      toggle(next)
+    }
+  })
 }
 
 // ---- 페이지 전체 드롭 업로드 ----
@@ -245,22 +267,36 @@ function commitMove(list, moving, category) {
       @dragleave.self="overCategory = null"
       @drop.prevent.stop="onDropOnCategory(g.name)"
     >
-      <h2 v-if="g.name">
-        <button class="toggle" :aria-expanded="!isCollapsed(g.name)" @click="toggle(g.name)">
+      <h2 v-if="g.name" :class="{ renaming: renamingCategory === g.name }">
+        <form v-if="renamingCategory === g.name" class="rename-form" @submit.prevent="submitRenameCategory">
+          <input
+            class="rename-cat"
+            v-model="renameValue"
+            autofocus
+            @keydown.esc="renamingCategory = null"
+            @blur="submitRenameCategory"
+          />
+        </form>
+        <button v-else class="toggle" :aria-expanded="!isCollapsed(g.name)" @click="toggle(g.name)">
           <svg class="caret" :class="{ closed: isCollapsed(g.name) }" width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
             <path d="M2 3.5 L5 6.5 L8 3.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
           </svg>{{ g.name }}
           <span v-if="isCollapsed(g.name) && g.list.length" class="count">{{ g.list.length }}</span>
         </button>
-        <button v-if="g.list.length === 0" class="remove-cat" @click="removeCategory(g.name)">지우기</button>
+        <span v-if="renamingCategory !== g.name" class="cat-actions">
+          <button class="ghost" @click="startRenameCategory(g.name)">수정</button>
+          <button class="ghost danger" @click="removeCategory(g)">삭제</button>
+        </span>
+        <span class="rule" aria-hidden="true"></span>
       </h2>
-      <h2 v-else-if="dragSlug && dragging && dragging.category" class="none-label">카테고리 없음</h2>
+      <h2 v-else-if="dragSlug && dragging && dragging.category" class="none-label">카테고리 없음<span class="rule" aria-hidden="true"></span></h2>
 
       <template v-if="!isCollapsed(g.name)">
         <div
-          v-for="it in g.list"
+          v-for="(it, idx) in g.list"
           :key="it.slug"
-          class="item"
+          class="item reveal"
+          :style="{ '--i': idx }"
           :class="{ dragging: dragSlug === it.slug, over: overSlug === it.slug, editing: editingSlug === it.slug }"
           :draggable="editingSlug !== it.slug"
           @dragstart="onDragStart(it, $event)"
