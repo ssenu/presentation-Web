@@ -12,9 +12,12 @@ def data_dir(tmp_path, monkeypatch):
     monkeypatch.setenv("DATA_DIR", str(tmp_path))
     monkeypatch.setenv("APP_PASSWORD", "pw")
     monkeypatch.setenv("SECRET_KEY", "s")
+    from app import ratelimit
     from app.config import get_settings
 
     get_settings.cache_clear()
+    ratelimit.reset()
+    monkeypatch.setattr(ratelimit, "FAIL_DELAY", 0)
     return tmp_path
 
 

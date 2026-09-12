@@ -53,3 +53,40 @@ def test_login_cookie_is_session_only(client):
     assert "max-age" not in set_cookie
     assert "expires" not in set_cookie
     assert "httponly" in set_cookie
+
+
+def test_login_rate_limit(client, monkeypatch):
+    from app import ratelimit
+
+    ratelimit.reset()
+    monkeypatch.setattr(ratelimit, "FAIL_DELAY", 0)
+    for _ in range(5):
+        assert client.post("/api/login", json={"password": "wrong"}).status_code == 401
+    r = client.post("/api/login", json={"password": "pw"})
+    assert r.status_code == 429
+    assert "잠시" in r.json()["detail"]
+
+
+def test_rate_limit_window_expires(client, monkeypatch):
+    from app import ratelimit
+
+    ratelimit.reset()
+    monkeypatch.setattr(ratelimit, "FAIL_DELAY", 0)
+    now = [1000.0]
+    monkeypatch.setattr(ratelimit.time, "monotonic", lambda: now[0])
+    for _ in range(5):
+        client.post("/api/login", json={"password": "wrong"})
+    assert client.post("/api/login", json={"password": "pw"}).status_code == 429
+    now[0] += 61
+    assert client.post("/api/login", json={"password": "pw"}).status_code == 200
+
+
+def test_failed_login_is_delayed(client, monkeypatch):
+    import time as _time
+    from app import ratelimit
+
+    ratelimit.reset()
+    monkeypatch.setattr(ratelimit, "FAIL_DELAY", 0.2)
+    t = _time.perf_counter()
+    client.post("/api/login", json={"password": "wrong"})
+    assert _time.perf_counter() - t >= 0.2

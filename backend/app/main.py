@@ -1,12 +1,12 @@
 import os
 from pathlib import Path
 
-from fastapi import Depends, FastAPI, HTTPException, Response
+from fastapi import Depends, FastAPI, HTTPException, Request, Response
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from . import auth, items
+from . import auth, items, ratelimit
 from .config import Settings, get_settings
 
 app = FastAPI(title="presentation-web")
@@ -23,8 +23,11 @@ def health():
 
 
 @app.post("/api/login")
-def login(body: LoginBody, response: Response, settings: Settings = Depends(get_settings)):
+def login(body: LoginBody, request: Request, response: Response, settings: Settings = Depends(get_settings)):
+    if ratelimit.is_limited(ratelimit.client_ip(request)):
+        raise HTTPException(status_code=429, detail="시도가 너무 많습니다. 잠시 후 다시 해 주세요")
     if not auth.check_password(settings, body.password):
+        ratelimit.penalize_failure()
         raise HTTPException(status_code=401, detail="비밀번호가 틀렸습니다")
     response.set_cookie(
         auth.COOKIE_NAME,

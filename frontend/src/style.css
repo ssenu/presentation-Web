@@ -73,11 +73,15 @@ input { font: inherit; color: inherit; }
   padding: 96px 24px 120px;
 }
 .page h1 {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
   font-size: 22px;
   font-weight: 500;
   letter-spacing: -0.01em;
   margin: 0 0 48px;
 }
+.page h1 .credit { color: var(--muted); font-size: 12px; font-weight: 400; }
 .hint { color: var(--muted); font-size: 14px; }
 .empty {
   color: var(--muted);
@@ -169,12 +173,44 @@ input { font: inherit; color: inherit; }
 }
 .item a:hover { text-decoration: underline; text-underline-offset: 4px; }
 
-.actions { display: flex; gap: 14px; opacity: 0; transition: opacity 120ms; }
+/* 오른쪽: 평소엔 업로드 일시, 마우스를 올리면 수정·삭제 */
+.side { position: relative; display: flex; align-items: center; justify-content: flex-end; min-width: 120px; }
+.time { color: #b0b0b0; font-size: 12px; font-variant-numeric: tabular-nums; white-space: nowrap; transition: opacity 120ms; }
+.actions { position: absolute; right: 0; display: flex; gap: 14px; opacity: 0; transition: opacity 120ms; }
+.item:hover .time, .item:focus-within .time { opacity: 0; }
 .item:hover .actions, .item:focus-within .actions { opacity: 1; }
 .actions button { font-size: 14px; color: var(--muted); }
 .actions button:hover { color: var(--ink); }
 .actions button.danger:hover { color: var(--danger); }
-@media (hover: none) { .actions { opacity: 1; } }
+@media (hover: none) {
+  .time { display: none; }
+  .actions { position: static; opacity: 1; }
+}
+
+/* 업로드 진행 표시 (상단 고정) */
+.progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background: var(--paper);
+  border-bottom: 1px solid var(--rule);
+}
+.progress-bar { height: 3px; background: var(--accent); transition: width 120ms linear; }
+.progress-text {
+  max-width: var(--col);
+  margin: 0 auto;
+  padding: 8px 24px;
+  font-size: 13px;
+  color: var(--muted);
+  display: flex;
+  gap: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.progress-pct { margin-left: auto; color: var(--ink); font-variant-numeric: tabular-nums; }
 
 .item input {
   padding: 6px 0;
@@ -208,7 +244,7 @@ input { font: inherit; color: inherit; }
 @keyframes fade { from { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) {
   .dropzone { animation: none; }
-  .actions, .item, .cat-actions { transition: none; }
+  .actions, .item, .cat-actions, .time, .progress-bar { transition: none; }
   .caret { transition: none; }
   .item.reveal { animation: none; }
 }

@@ -95,6 +95,8 @@ async def upload_item(
             store.remove(target.slug)
         raise HTTPException(status_code=e.status_code, detail=e.detail)
 
+    if existing is not None:
+        target = store.touch(target.slug)
     response.status_code = status
     return target
 

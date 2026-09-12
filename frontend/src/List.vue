@@ -1,6 +1,6 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import { api } from './api'
+import { api, uploadWithProgress } from './api'
 
 const emit = defineEmits(['logout'])
 const items = ref([])
@@ -8,6 +8,14 @@ const categoryNames = ref([])
 const error = ref('')
 const notice = ref('')
 const uploading = ref(false)
+// 진행 표시: { name, index, total, ratio }
+const progress = ref(null)
+
+function formatTime(iso) {
+  if (!iso) return ''
+  // "2026-09-12T13:45" → "2026-09-12 13:45"
+  return iso.replace('T', ' ')
+}
 const fileOver = ref(false)
 const editingSlug = ref(null)
 const editTitle = ref('')
@@ -143,13 +151,27 @@ async function onWindowDrop(e) {
     error.value = 'zip 또는 html 파일만 올릴 수 있습니다.'
     return
   }
+  await uploadFiles(files)
+}
+async function uploadFiles(files) {
+  if (uploading.value) {
+    error.value = '이미 올리는 중입니다. 끝난 뒤 다시 놓아 주세요.'
+    return
+  }
   uploading.value = true
-  notice.value = `${files.length}개 올리는 중`
   await run(async () => {
-    for (const f of files) await api.upload(f, '', '')
+    for (let i = 0; i < files.length; i++) {
+      const f = files[i]
+      progress.value = { name: f.name, index: i + 1, total: files.length, ratio: 0 }
+      await uploadWithProgress(f, (ratio) => {
+        if (progress.value) progress.value.ratio = ratio
+      })
+      // 전송이 끝나면 서버가 압축을 푸는 동안 100% 로 표시된다.
+      if (progress.value) progress.value.ratio = 1
+    }
   })
   uploading.value = false
-  notice.value = ''
+  progress.value = null
 }
 
 onMounted(() => {
@@ -248,7 +270,15 @@ function commitMove(list, moving, category) {
 
 <template>
   <div class="page">
-    <h1>발표자료</h1>
+    <div v-if="progress" class="progress" role="status" aria-live="polite">
+      <div class="progress-bar" :style="{ width: Math.round(progress.ratio * 100) + '%' }"></div>
+      <div class="progress-text">
+        올리는 중 {{ progress.total > 1 ? `${progress.index}/${progress.total} · ` : '' }}{{ progress.name }}
+        <span class="progress-pct">{{ Math.round(progress.ratio * 100) }}%</span>
+      </div>
+    </div>
+
+    <h1>발표자료 <span class="credit">by_ ssenu</span></h1>
 
     <div v-if="error" class="error">{{ error }}</div>
     <div v-if="notice" class="hint">{{ notice }}</div>
@@ -312,9 +342,12 @@ function commitMove(list, moving, category) {
           </template>
           <template v-else>
             <a :href="`/p/${encodeURIComponent(it.slug)}/`" target="_blank" rel="noopener">{{ it.title }}</a>
-            <span class="actions">
-              <button class="ghost" @click="startEdit(it)">수정</button>
-              <button class="danger" @click="remove(it)">삭제</button>
+            <span class="side">
+              <span v-if="it.uploaded_at" class="time">{{ formatTime(it.uploaded_at) }}</span>
+              <span class="actions">
+                <button class="ghost" @click="startEdit(it)">수정</button>
+                <button class="danger" @click="remove(it)">삭제</button>
+              </span>
             </span>
           </template>
         </div>
@@ -340,7 +373,7 @@ function commitMove(list, moving, category) {
     </div>
 
     <div v-if="fileOver" class="dropzone">
-      <div>{{ uploading ? '올리는 중' : '놓으면 올라갑니다' }}</div>
+      <div>{{ uploading ? '올리는 중입니다. 끝난 뒤 다시 놓아 주세요' : '놓으면 올라갑니다' }}</div>
     </div>
   </div>
 </template>

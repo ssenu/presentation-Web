@@ -145,3 +145,21 @@ def test_rename_category(store):
 def test_categories_persist(tmp_path):
     Store(tmp_path).add_category("c")
     assert Store(tmp_path).categories() == ["c"]
+
+
+def test_old_index_without_timestamp_loads(tmp_path):
+    (tmp_path / "index.json").write_text(
+        '{"items": [{"slug": "a", "title": "a", "category": "", "order": 0}]}', "utf-8"
+    )
+    s = Store(tmp_path)
+    assert s.get("a").uploaded_at is None  # 폴더가 없으면 채울 수 없다
+
+
+def test_old_item_gets_timestamp_from_folder_mtime(tmp_path):
+    (tmp_path / "index.json").write_text(
+        '{"items": [{"slug": "a", "title": "a", "category": "", "order": 0}]}', "utf-8"
+    )
+    (tmp_path / "presentations" / "a").mkdir(parents=True)
+    s = Store(tmp_path)
+    assert s.get("a").uploaded_at is not None
+    assert len(s.get("a").uploaded_at) == 16

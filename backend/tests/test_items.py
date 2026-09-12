@@ -72,7 +72,8 @@ def test_patch(auth):
     upload(auth, title="a")
     r = auth.patch("/api/items/a", json={"title": "b", "category": "cat"})
     assert r.status_code == 200
-    assert r.json() == {"slug": "a", "title": "b", "category": "cat", "order": 0}
+    body = r.json()
+    assert (body["slug"], body["title"], body["category"], body["order"]) == ("a", "b", "cat", 0)
     assert auth.patch("/api/items/zzz", json={"title": "b"}).status_code == 404
 
 
@@ -142,3 +143,16 @@ def test_category_api(auth):
     assert auth.get("/api/items").json()[0]["category"] == ""
     assert auth.delete("/api/categories/팀").status_code == 404
     assert auth.get("/api/categories").json() == ["다른"]
+
+
+def test_upload_sets_timestamp_and_overwrite_updates_it(auth, monkeypatch):
+    from app import store as store_mod
+
+    ticks = iter(["2026-09-12T10:00", "2026-09-12T11:30"])
+    monkeypatch.setattr(store_mod, "_now", lambda: next(ticks))
+    r = upload(auth, title="a")
+    assert r.json()["uploaded_at"] == "2026-09-12T10:00"
+    r = upload(auth, title="a", files={"index.html": b"v2"})
+    assert r.status_code == 200
+    assert r.json()["uploaded_at"] == "2026-09-12T11:30"
+    assert auth.get("/api/items").json()[0]["uploaded_at"] == "2026-09-12T11:30"

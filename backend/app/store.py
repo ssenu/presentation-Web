@@ -4,7 +4,9 @@ import json
 import os
 import re
 import tempfile
+from datetime import datetime
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 from pydantic import BaseModel
 
@@ -18,11 +20,18 @@ def slugify(title: str) -> str:
     return s or "item"
 
 
+def _now() -> str:
+    """업로드 시각. 분 단위. 시간대는 TZ 환경변수(기본 Asia/Seoul)."""
+    tz = ZoneInfo(os.environ.get("TZ", "Asia/Seoul"))
+    return datetime.now(tz).strftime("%Y-%m-%dT%H:%M")
+
+
 class Item(BaseModel):
     slug: str
     title: str
     category: str = ""
     order: int
+    uploaded_at: str | None = None
 
 
 class Store:
@@ -38,6 +47,13 @@ class Store:
             return [], []
         raw = json.loads(self.index_path.read_text("utf-8"))
         items = [Item(**i) for i in raw.get("items", [])]
+        # 시각 기록 이전에 올린 파일은 폴더 수정 시각으로 채운다.
+        tz = ZoneInfo(os.environ.get("TZ", "Asia/Seoul"))
+        for it in items:
+            if it.uploaded_at is None:
+                folder = self.item_dir(it.slug)
+                if folder.exists():
+                    it.uploaded_at = datetime.fromtimestamp(folder.stat().st_mtime, tz).strftime("%Y-%m-%dT%H:%M")
         categories = [str(c) for c in raw.get("categories", [])]
         # 예전 데이터에는 카테고리 목록이 없으므로 항목에서 보충한다.
         for it in items:
@@ -73,7 +89,9 @@ class Store:
 
     def add(self, title: str, category: str = "") -> Item:
         order = max((i.order for i in self._items), default=-1) + 1
-        item = Item(slug=self._unique_slug(slugify(title)), title=title, category=category, order=order)
+        item = Item(
+            slug=self._unique_slug(slugify(title)), title=title, category=category, order=order, uploaded_at=_now()
+        )
         self._items.append(item)
         self._register_category(category)
         self._save()
@@ -135,6 +153,15 @@ class Store:
                 it.category = new
         self._save()
         return new
+
+    def touch(self, slug: str) -> Item:
+        """덮어쓰기 후 업로드 시각을 갱신한다."""
+        item = self.get(slug)
+        if item is None:
+            raise KeyError(slug)
+        item.uploaded_at = _now()
+        self._save()
+        return item
 
     def remove(self, slug: str) -> None:
         item = self.get(slug)
