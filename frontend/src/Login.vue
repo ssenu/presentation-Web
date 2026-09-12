@@ -35,6 +35,7 @@ async function submit() {
       />
       <div><button class="go" :disabled="busy || !password">들어가기</button></div>
       <div v-if="error" class="error">{{ error }}</div>
+      <p class="credit">by_ ssenu</p>
     </div>
   </form>
 </template>

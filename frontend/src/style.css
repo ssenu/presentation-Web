@@ -64,6 +64,7 @@ input { font: inherit; color: inherit; }
 }
 .login .go:disabled { color: var(--muted); text-decoration: none; cursor: default; }
 .error { color: var(--danger); font-size: 14px; margin-top: 12px; }
+.login .credit { color: var(--muted); font-size: 12px; margin: 40px 0 0; }
 
 /* ---------- 목록 ---------- */
 .page {
